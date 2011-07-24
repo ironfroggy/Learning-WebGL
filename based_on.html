@@ -160,19 +160,7 @@
             0, 1, 0, 0, 1, 1);
         triangle.rotationAxis = [0.0, 0.5, 1.0];
 
-        square = new grumpy.Shape();
-        square.addVertex(
-            1, 1, 0,
-            0, 1, 0, 1);
-        square.addVertex(
-            -1, 1, 0,
-            1, 0, 0, 1);
-        square.addVertex(
-            1, -1, 0,
-            0, 0, 1, 1);
-        square.addVertex(
-            -1, -1, 0,
-            1, 1, 0, 1);
+        square = new grumpy.Square(1, grumpy.Color.RED);
         square.rotationAxis = [0, 0, 1];
     }
 

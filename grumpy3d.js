@@ -1,6 +1,17 @@
 var grumpy = {};
 
 (function(){
+
+    grumpy.Color = function(r, g, b, a) {
+        this[0] = r;
+        this[1] = g;
+        this[2] = b;
+        this[3] = a;
+    };
+    grumpy.Color.RED = new grumpy.Color(1, 0, 0, 1);
+    grumpy.Color.GREEN = new grumpy.Color(0, 1, 0, 1);
+    grumpy.Color.BLUE = new grumpy.Color(0, 0, 1, 1);
+
     grumpy.Shape = function() {
         this.position = [0.0, 0.0, 0.0];
         this.rotationDegree = 0;
@@ -63,6 +74,37 @@ var grumpy = {};
 
         if (this.rotationDegree != 0) {
             mvPopMatrix();
+        }
+    }
+
+    grumpy.Square = function Square(size, color) {
+        grumpy.Shape.call(this);
+        this.addVertex(
+            size, size, 0,
+            color[0], color[1], color[2], color[3]);
+        this.addVertex(
+            -size, size, 0,
+            color[0], color[1], color[2], color[3]);
+        this.addVertex(
+            size, -size, 0,
+            color[0], color[1], color[2], color[3]);
+        this.addVertex(
+            -size, -size, 0,
+            color[0], color[1], color[2], color[3]);
+    }
+    extend(grumpy.Square, grumpy.Shape);
+
+    /* INTERNAL UTILITIES */
+
+    function extend(subClass, superClass) {
+        var F = function() {};
+        F.prototype = superClass.prototype;
+        subClass.prototype = new F();
+        subClass.prototype.constructor = subClass;
+
+        subClass.superclass = superClass.prototype;
+        if(superClass.prototype.constructor == Object.prototype.constructor) {
+            superClass.prototype.constructor = superClass;
         }
     }
 
