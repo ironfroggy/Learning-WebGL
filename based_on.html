@@ -6,6 +6,7 @@
 
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="grumpy3d.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
     #ifdef GL_ES
@@ -39,8 +40,7 @@
 
     var gl
     ,   t = 0
-    ,   trianglePos
-    ,   triangleRot = 0
+    ,   triangle
     ,   squarePos
     ,   squareRot = 0
     ;
@@ -148,33 +148,22 @@
     }
 
 
-    var triangleVertexPositionBuffer;
-    var triangleVertexColorBuffer;
     var squareVertexPositionBuffer;
     var squareVertexColorBuffer;
 
     function initBuffers() {
-        triangleVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
-        var vertices = [
+        triangle = new grumpy.Shape();
+        triangle.addVertex(
              0.0,  1.0,  0.0,
+            0, 1, 1, 0, 0, 1);
+        triangle.addVertex(
             -1.0, -1.0,  0.0,
-             1.0, -1.0,  0.0
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        triangleVertexPositionBuffer.itemSize = 3;
-        triangleVertexPositionBuffer.numItems = 3;
-
-        triangleVertexColorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
-        var colors = [
-            1, 0, 0, 1,
-            0, 1, 0, 1,
-            0, 0, 1, 1
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-        triangleVertexColorBuffer.itemSize = 4;
-        triangleVertexColorBuffer.numItems = 3;
+            0, 1, 0, 1, 0, 1);
+        triangle.addVertex(
+             1.0, -1.0,  0.0,
+            0, 1, 0, 0, 1, 1);
+        triangle._fillBuffers();
+        triangle.rotationAxis = [0.0, 0.5, 1.0];
 
         squareVertexPositionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
@@ -211,20 +200,7 @@
 
         // triangle
 
-        mat4.identity(mvMatrix);
-        mat4.translate(mvMatrix, trianglePos);
-
-        mvPushMatrix();
-        mat4.rotate(mvMatrix, degToRad(triangleRot), [0, 0.5, 1]);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, triangleVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-        setMatrixUniforms();
-        gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
-
-        mvPopMatrix();
+        triangle.draw();
 
         // square
 
@@ -276,8 +252,8 @@
         if (last_t != 0) {
             d = t - last_t;
 
-            trianglePos = [-1.5, 3, -0.01 * (t % 10000)];
-            triangleRot += (90 * d) / 1000.0;
+            triangle.position = [-1.5, 3, -0.01 * (t % 10000)];
+            triangle.rotationDegree += (90 * d) / 1000.0;
 
             squarePos = [1.5, 0 - Math.sin(t/300), -0.01 * (10000 - (t % 10000))];
             squareRot += (130 * d) / 1000.0;
