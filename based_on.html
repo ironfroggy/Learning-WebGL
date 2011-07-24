@@ -158,9 +158,7 @@
         triangle.addVertex(
              1.0, -1.0,  0.0,
             0, 1, 0, 0, 1, 1);
-        triangle._fillBuffers();
         triangle.rotationAxis = [0.0, 0.5, 1.0];
-
 
         square = new grumpy.Shape();
         square.addVertex(
@@ -175,9 +173,7 @@
         square.addVertex(
             -1, -1, 0,
             1, 1, 0, 1);
-        square._fillBuffers();
         square.rotationAxis = [0, 0, 1];
-        square.drawMode = gl.TRIANGLE_STRIP;
     }
 
 

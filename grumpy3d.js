@@ -16,7 +16,7 @@ var grumpy = {};
         this.colorBuffer = gl.createBuffer();
         this.colorBuffer.itemSize = 4;
 
-        this.drawMode = gl.TRIANGLES;
+        this.drawMode = gl.TRIANGLE_STRIP;
     }
 
     grumpy.Shape.prototype.addVertex = function addVertex(x, y, z, r, g, b, a) {
@@ -30,6 +30,8 @@ var grumpy = {};
         this.vertexColors.push(a);
 
         this.vertexCount += 1;
+
+        this._fillBuffers();
     };
 
     grumpy.Shape.prototype._fillBuffers = function _fillBuffers() {
@@ -63,4 +65,5 @@ var grumpy = {};
             mvPopMatrix();
         }
     }
+
 })();
