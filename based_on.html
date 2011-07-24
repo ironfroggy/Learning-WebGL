@@ -41,8 +41,7 @@
     var gl
     ,   t = 0
     ,   triangle
-    ,   squarePos
-    ,   squareRot = 0
+    ,   square
     ;
     function initGL(canvas) {
         try {
@@ -148,9 +147,6 @@
     }
 
 
-    var squareVertexPositionBuffer;
-    var squareVertexColorBuffer;
-
     function initBuffers() {
         triangle = new grumpy.Shape();
         triangle.addVertex(
@@ -165,30 +161,23 @@
         triangle._fillBuffers();
         triangle.rotationAxis = [0.0, 0.5, 1.0];
 
-        squareVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-        vertices = [
-             1.0,  1.0,  0.0,
-            -1.0,  1.0,  0.0,
-             1.0, -1.0,  0.0,
-            -1.0, -1.0,  0.0
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        squareVertexPositionBuffer.itemSize = 3;
-        squareVertexPositionBuffer.numItems = 4;
 
-        squareVertexColorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
-        colors = [
-            0, 1, 0, 1,
-            1, 0, 0, 1,
-            0, 0, 1, 1,
-            1, 1, 0, 1
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-        squareVertexColorBuffer.itemSize = 4;
-        squareVertexColorBuffer.numItems = 4;
-
+        square = new grumpy.Shape();
+        square.addVertex(
+            1, 1, 0,
+            0, 1, 0, 1);
+        square.addVertex(
+            -1, 1, 0,
+            1, 0, 0, 1);
+        square.addVertex(
+            1, -1, 0,
+            0, 0, 1, 1);
+        square.addVertex(
+            -1, -1, 0,
+            1, 1, 0, 1);
+        square._fillBuffers();
+        square.rotationAxis = [0, 0, 1];
+        square.drawMode = gl.TRIANGLE_STRIP;
     }
 
 
@@ -204,20 +193,7 @@
 
         // square
 
-        mat4.identity(mvMatrix);
-        mat4.translate(mvMatrix, squarePos);
-
-        mvPushMatrix();
-        mat4.rotate(mvMatrix, degToRad(squareRot), [0, 0, 1]);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-        setMatrixUniforms();
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
-
-        mvPopMatrix();
+        square.draw();
     }
 
 
@@ -255,8 +231,8 @@
             triangle.position = [-1.5, 3, -0.01 * (t % 10000)];
             triangle.rotationDegree += (90 * d) / 1000.0;
 
-            squarePos = [1.5, 0 - Math.sin(t/300), -0.01 * (10000 - (t % 10000))];
-            squareRot += (130 * d) / 1000.0;
+            square.position = [1.5, 0 - Math.sin(t/300), -0.01 * (10000 - (t % 10000))];
+            square.rotationDegree += (130 * d) / 1000.0;
         }
         last_t = t;
     }
