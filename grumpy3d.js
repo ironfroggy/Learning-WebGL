@@ -53,6 +53,10 @@ var grumpy = {};
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertexColors), gl.STATIC_DRAW);
     };
 
+    grumpy.Shape.prototype._drawVertices = function() {
+        gl.drawArrays(this.drawMode, 0, this.vertexCount);
+    };
+
     grumpy.Shape.prototype.draw = function draw() {
         mat4.identity(mvMatrix);
         mat4.translate(mvMatrix, this.position);
@@ -70,7 +74,7 @@ var grumpy = {};
 
         setMatrixUniforms();
 
-        gl.drawArrays(this.drawMode, 0, this.vertexCount);
+        this._drawVertices();
 
         if (this.rotationDegree != 0) {
             mvPopMatrix();
@@ -91,8 +95,89 @@ var grumpy = {};
         this.addVertex(
             -size, -size, 0,
             color[0], color[1], color[2], color[3]);
-    }
+    };
     extend(grumpy.Square, grumpy.Shape);
+
+    grumpy.Cube = function Cube(size, colors) {
+        grumpy.Shape.call(this);
+        this.drawMode = gl.TRIANGLES;
+
+        vertices = [
+          // Front face
+          -size, -size,  size,
+           size, -size,  size,
+           size,  size,  size,
+          -size,  size,  size,
+
+          // Back face
+          -size, -size, -size,
+          -size,  size, -size,
+           size,  size, -size,
+           size, -size, -size,
+        ];
+        /*
+
+          // Top face
+          -size,  size, -size,
+          -size,  size,  size,
+           size,  size,  size,
+           size,  size, -size,
+
+          // Bottom face
+          -size, -size, -size,
+           size, -size, -size,
+           size, -size,  size,
+          -size, -size,  size,
+
+          // Right face
+           size, -size, -size,
+           size,  size, -size,
+           size,  size,  size,
+           size, -size,  size,
+
+          // Left face
+          -size, -size, -size,
+          -size, -size,  size,
+          -size,  size,  size,
+          -size,  size, -size,
+        ];
+        */
+
+        colors = [
+          [1.0, 0.0, 0.0, 1.0],     // Front face
+          [1.0, 1.0, 0.0, 1.0],     // Back face
+          [0.0, 1.0, 0.0, 1.0],     // Top face
+          [1.0, 0.5, 0.5, 1.0],     // Bottom face
+          [1.0, 0.0, 1.0, 1.0],     // Right face
+          [0.0, 0.0, 1.0, 1.0],     // Left face
+        ];
+
+        var v_order = [0, 1, 2, 0, 3, 2];
+        for (var i = 0; i < vertices.length/12; i) {
+            for (var j = 0; j < v_order.length; j++) {
+                var v_i = v_order[j] * 3;
+                console.log(
+                    i, j, '-',
+                    vertices[i + v_i + 0],
+                    vertices[i + v_i + 1],
+                    vertices[i + v_i + 2]
+                );
+                this.addVertex(
+                    vertices[i + v_i + 0],
+                    vertices[i + v_i + 1],
+                    vertices[i + v_i + 2],
+                    colors[i][0],
+                    colors[i][1],
+                    colors[i][2],
+                    colors[i][3]
+                );
+            }
+        }
+    };
+    grumpy.Cube.prototype._drawVertices = function() {
+        gl.drawElements(gl.TRIANGLES, this.elementBuffer.numItems, gl.SIGNED_SHORT, 0);
+    };
+    extend(grumpy.Cube, grumpy.Shape);
 
     /* INTERNAL UTILITIES */
 
